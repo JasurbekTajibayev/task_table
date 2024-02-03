@@ -97,16 +97,15 @@
   <div class="p-3">
   <ul class="pagination justify-content-center">
   <li class="page-item" title="Begin"  @click="goPage(1)"><a class="page-link" href="#"><span class="pi pi-angle-double-left"></span></a></li>
-  <li class="page-item" title="Previous"><a class="page-link" href="#"><span class="fa fa-angle-left"></span></a></li>
-  <li class="page-item"><a class="page-link" href="#">1</a></li>
-  <li class="page-item"><a class="page-link" href="#">2</a></li>
-  <li class="page-item active"><a class="page-link" href="#">3</a></li>
-  <li class="page-item"><a class="page-link" href="#">4</a></li>
-  <li class="page-item"><a class="page-link" href="#">5</a></li>
-  <li class="page-item" title="Next"><a class="page-link" href="#"><span class="fa fa-angle-right"></span></a></li>
+  <li class="page-item" title="Previous" @click="goPage(Params.page-1)" v-if="Params.page!=1"><a class="page-link" href="#"><span class="fa fa-angle-left"></span></a></li>
+  <!-- <li v-for="item in (pages_count>5?5:pages_count)" class="page-item" :class="item==Params.page?'active':''" @click="goPage(item)" ><a class="page-link" href="#">{{item}}</a></li> -->
+  <li v-for="item in (Params.page-1>2?2:Params.page-1)" class="page-item" @click="goPage(Params.page+item-(Params.page==2?2:3))" :title="Params.page+item-(Params.page==2?2:3)"><a class="page-link" href="#">{{Params.page+item-(Params.page==2?2:3)}}</a></li>
+  <li class="page-item active" title="Current"><a class="page-link" href="#">{{Params.page}}</a></li>
+  <li v-for="item in (pages_count-Params.page)>=2?2:(pages_count-Params.page)" class="page-item" @click="goPage(Params.page+item)" :title="Params.page+item" ><a class="page-link" href="#">{{Params.page+item}}</a></li>
+  <li class="page-item" title="Next" @click="goPage(Params.page+1)" v-if="Params.page!=pages_count"><a class="page-link" href="#"><span class="fa fa-angle-right"></span></a></li>
   <li class="page-item" title="End" @click="goPage(pages_count)"><a class="page-link" href="#"><span class="pi pi-angle-double-right"></span></a></li>
 
-  <select class="form-select" style="width: 5rem; margin-left: 4rem;" v-model="Params.page_size" @change="getProblems()">
+  <select class="form-select" style="width: 5rem; margin-left: 4rem;" v-model="Params.page_size" @change="getProblems(), goPage(1)">
     <option value="10">10</option>
     <option value="20" selected>20</option>
     <option value="30">30</option>
@@ -144,7 +143,7 @@ export default {
         },
       count: null,
       total: null,
-      pages_count: null,
+      pages_count: 1,
       problems: [],
       tags: api.methods.getTags().then((value)=>{this.tags=value;}, (error)=>{ this.tags=[]; }),
       difficulty: api.methods.getDiff().then((value)=>{this.difficulty=value}, (error)=>{this.difficulty=[]}),
@@ -176,6 +175,7 @@ export default {
                 this.problems=data.data;
                 this.total=data.total;
                 this.pages_count=data.pagesCount;
+                
 
       } catch (error) {
         console.log(error)
